@@ -12,9 +12,6 @@ app.use(express.json());
 app.post('/convert', async (req, res) => {
     const { url } = req.body;
     
-    // This will print in Render so we know it arrived!
-    console.log("Received request for URL:", url); 
-    
     if (!url) {
         return res.status(400).send('No URL provided');
     }
@@ -23,13 +20,20 @@ app.post('/convert', async (req, res) => {
     const filePath = path.join(__dirname, fileName);
     
     try {
-        console.log("Starting optimized audio download...");
+        console.log("Starting anti-bot audio download...");
+        
         await youtubedl(url, {
             extractAudio: true,
             audioFormat: 'mp3',
-            format: 'bestaudio', // Ignores the heavy video stream
-            ffmpegLocation: ffmpegPath, // Provides the missing MP3 software
-            output: filePath
+            format: 'bestaudio', 
+            ffmpegLocation: ffmpegPath, 
+            output: filePath,
+            noCheckCertificates: true,
+            noWarnings: true,
+            addHeader: [
+                'referer:youtube.com', 
+                'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            ]
         });
 
         console.log("Conversion complete! Sending file...");
